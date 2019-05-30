@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-def getSCMInfroFromLatestGoodBuild(url, jobName, username=adong, password=Barton@679768):
+def getSCMInfroFromLatestGoodBuild(url, jobName, username='adong', password='Barton@679768'):
     J = Jenkins(url, username, password)
     job = J[jobName]
     lgb = job.get_last_good_build()
