@@ -1,5 +1,4 @@
 #!/usr/bin/env groovy
-from jenkinsapi.jenkins import Jenkins
 
 def getSCMInfroFromLatestGoodBuild(url, jobName, username=adong, password=Barton@679768):
     J = Jenkins(url, username, password)
@@ -100,7 +99,7 @@ pipeline{
                     sh(script:"curl -X POST http://builds.elasticpath.net/pd/job/master/job/release_stage-git-branch-to-git-repository/build?token=12345 
                                 --data-urlencode json='{"parameter": [{"SOURCE_GIT_URL":"git@github.elasticpath.net:ep-source-deploy/ep-commerce.git", 
                                 "SOURCE_GIT_BRANCH":"${pipeline}", "STAGING_GIT_URL":"git@code.elasticpath.com:ep-commerce-STAGING/ep-commerce.git","STAGING_GIT_BRANCH":"release/next",
-                                "FORCE_PUSH":"true", "PIPELINE_BUILD_ID":"${pipeline}"}]}' ")
+                                "FORCE_PUSH":"true", "PIPELINE_BUILD_ID":"${pipeline}"]}' ")
                 }
             }
         }
