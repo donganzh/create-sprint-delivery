@@ -21,7 +21,7 @@ pipeline{
                 script{
                     sh ( script: "git clone https://github.elasticpath.net/commerce/ep-commerce.git")
                     api_platform_version = sh(script: "xmlstarlet sel -t -v /_:project/_:properties/_:api-platform.version pom.xml")
-                    echo ${api_platform_version}
+                    echo api_platform_version
                 }   
             }
         }
@@ -30,7 +30,7 @@ pipeline{
                 script{
                     sh (script: "wget -m https://nexus-master.elasticpath.net/nexus/content/repositories/ep-releases/com/elasticpath/rest/bill-of-materials/")
                     count = sh(script: "grep -c ${api_platform_version} nexus-master.elasticpath.net/nexus/content/repositories/ep-releases/com/elasticpath/rest/bill-of-materials/index.html")
-
+                    echo count
                     }
                 }
             }
@@ -49,7 +49,7 @@ pipeline{
                 steps{
                     script{
                         pipeline_id = getSCMInfroFromLatestGoodBuild('http://builds.elasticpath.net/pd/job/master/job/task_release-ep-commerce/')
-                        echo ${pipeline_id}
+                        echo pipeline_id
                     }
                 }
             }
