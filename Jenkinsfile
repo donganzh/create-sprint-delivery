@@ -20,8 +20,8 @@ pipeline{
             steps{
                 script{
                     sh ( script: "git clone https://github.elasticpath.net/commerce/ep-commerce.git")
-                    api_platform_version = sh(script: "xmlstarlet sel -t -v /_:project/_:properties/_:api-platform.version pom.xml")
-                    echo api_platform_version
+                    //api_platform_version = sh(script: "xmlstarlet sel -t -v /_:project/_:properties/_:api-platform.version pom.xml")
+                    //echo api_platform_version
                 }   
             }
         }
