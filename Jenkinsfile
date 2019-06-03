@@ -79,8 +79,8 @@ pipeline{
                 steps{
                     script{
                         good_version = getSCMInfroFromLatestGoodBuild('http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/')
-                        sh(script:"curl -X POST http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/build?token=12345 \
-                                    --data-urlencode json='{"parameter": [{"RELEASE_LEVEL":"minor"}]}'")
+                        sh(script:"""curl -X POST http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/build?token=12345 \
+                                    --data-urlencode json='{"parameter": [{"RELEASE_LEVEL":"minor"}]}'""")
                     }
                 }
             }
@@ -96,18 +96,18 @@ pipeline{
         stage('Release stage git branch to git repo'){//step 5
             steps{
                 script{
-                    sh(script:"curl -X POST http://builds.elasticpath.net/pd/job/master/job/release_stage-git-branch-to-git-repository/build?token=12345 
+                    sh(script:"""curl -X POST http://builds.elasticpath.net/pd/job/master/job/release_stage-git-branch-to-git-repository/build?token=12345 
                                 --data-urlencode json='{"parameter": [{"SOURCE_GIT_URL":"git@github.elasticpath.net:ep-source-deploy/ep-commerce.git", 
                                 "SOURCE_GIT_BRANCH":"${pipeline}", "STAGING_GIT_URL":"git@code.elasticpath.com:ep-commerce-STAGING/ep-commerce.git","STAGING_GIT_BRANCH":"release/next",
-                                "FORCE_PUSH":"true", "PIPELINE_BUILD_ID":"${pipeline}"]}' ")
+                                "FORCE_PUSH":"true", "PIPELINE_BUILD_ID":"${pipeline}"]}' """)
                 }
             }
         }
         stage('Build gitlab staging epc branch'){
             steps{
                 script{
-                    sh(script:"curl -X POST http://10.11.12.13/pd/view/Support/job/epc-patch/job/build-gitlab-staging-epc-branch/build?token=12345 \
-                                    --data-urlencode json='{"parameter": [{"VERSION":"next"}]}'")
+                    sh(script:"""curl -X POST http://10.11.12.13/pd/view/Support/job/epc-patch/job/build-gitlab-staging-epc-branch/build?token=12345 \
+                                    --data-urlencode json='{"parameter": [{"VERSION":"next"}]}'""")
                 }
             }
         }
