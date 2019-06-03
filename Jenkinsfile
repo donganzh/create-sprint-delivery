@@ -34,33 +34,39 @@ pipeline{
                     }
                 }
             }
-        if(count == '0'){
-            stage('Release api-platform'){//step 3
-                steps{
-                    script{
+       
+        stage('Release api-platform'){//step 3
+            steps{
+                script{ 
+                    if(count == 0){
                         good_version = getSCMInfroFromLatestGoodBuild('http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/')
                         sh(script:"""curl -X POST http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/build?token=12345 \
-                                    --data-urlencode json='{"parameter": [{"RELEASE_LEVEL":"minor"}]}'""")
+                                --data-urlencode json='{"parameter": [{"RELEASE_LEVEL":"minor"}]}'""")
+                        
                     }
                 }
             }
-        }else{
-            stage('Find pipeline ID'){//step 4
-                steps{
-                    script{
+        }    
+        
+        stage('Find pipeline ID'){//step 4
+            steps{
+                script{
+                    if(count > 0){
                         pipeline_id = getSCMInfroFromLatestGoodBuild('http://builds.elasticpath.net/pd/job/master/job/task_release-ep-commerce/')
                         echo pipeline_id
                     }
                 }
             }
         }
+        
         stage('Release stage git branch to git repo'){//step 5
             steps{
                 script{
                     sh(script:"""curl -X POST http://builds.elasticpath.net/pd/job/master/job/release_stage-git-branch-to-git-repository/build?token=12345 
                                 --data-urlencode json='{"parameter": [{"SOURCE_GIT_URL":"git@github.elasticpath.net:ep-source-deploy/ep-commerce.git", 
                                 "SOURCE_GIT_BRANCH":"${pipeline_id}", "STAGING_GIT_URL":"git@code.elasticpath.com:ep-commerce-STAGING/ep-commerce.git","STAGING_GIT_BRANCH":"release/next",
-                                "FORCE_PUSH":"true", "PIPELINE_BUILD_ID":"${pipeline_id}"]}' """)
+                                "FORCE_PUSH":"true", "PIPELINE_BUILD_ID":"${pipeline_id}"]}' """
+                                )
                 }
             }
         }
