@@ -15,54 +15,13 @@ pipeline{
     agent{
         label "node-2xlarge"
     }
-    // environment{
-
-    // }
-    // options{
-    //     buildDiscarder(
-
-    //     )
-    //     disableConcurrentBuilds(
-
-    //     ) non
-    //     skipDefaultCheckout(
-
-    //     )
-    //     timeout(
-
-    //     )
-    //     retry(
-
-    //     )
-    //     timestamps(
-
-    //     )
-    // }
-    // parameters{
-    //     string(
-
-    //     )
-    //     booleanParam(
-
-    //     )
-    //     choice(
-
-    //     )
-    // }
-    // triggers{
-    //     cron(
-
-    //     )
-    //     PollSCM(
-
-    //     )
-    // }
     stages{
         stage('Clone sources'){//step 1
             steps{
                 script{
                     sh ( script: "git clone https://github.elasticpath.net/commerce/ep-commerce.git")
                     api_platform_version = sh(script: "xmlstarlet sel -t -v /_:project/_:properties/_:api-platform.version pom.xml")
+                    echo ${api_platform_version}
                 }   
             }
         }
@@ -90,6 +49,7 @@ pipeline{
                 steps{
                     script{
                         pipeline_id = getSCMInfroFromLatestGoodBuild('http://builds.elasticpath.net/pd/job/master/job/task_release-ep-commerce/')
+                        echo ${pipeline_id}
                     }
                 }
             }
@@ -99,8 +59,8 @@ pipeline{
                 script{
                     sh(script:"""curl -X POST http://builds.elasticpath.net/pd/job/master/job/release_stage-git-branch-to-git-repository/build?token=12345 
                                 --data-urlencode json='{"parameter": [{"SOURCE_GIT_URL":"git@github.elasticpath.net:ep-source-deploy/ep-commerce.git", 
-                                "SOURCE_GIT_BRANCH":"${pipeline}", "STAGING_GIT_URL":"git@code.elasticpath.com:ep-commerce-STAGING/ep-commerce.git","STAGING_GIT_BRANCH":"release/next",
-                                "FORCE_PUSH":"true", "PIPELINE_BUILD_ID":"${pipeline}"]}' """)
+                                "SOURCE_GIT_BRANCH":"${pipeline_id}", "STAGING_GIT_URL":"git@code.elasticpath.com:ep-commerce-STAGING/ep-commerce.git","STAGING_GIT_BRANCH":"release/next",
+                                "FORCE_PUSH":"true", "PIPELINE_BUILD_ID":"${pipeline_id}"]}' """)
                 }
             }
         }
