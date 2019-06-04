@@ -19,8 +19,13 @@ pipeline{
         stage('Clone sources'){//step 1
             steps{
                 script{
-                    sh ( script: "git clone https://github.elasticpath.net/commerce/ep-commerce.git")
-                    api_platform_version = sh(script: "xmlstarlet sel -t -v /_:project/_:properties/_:api-platform.version pom.xml")
+                    
+                    sh ( script: """
+                            if [ ! -d "$ep-commerce"]; then
+                                git clone https://github.elasticpath.net/commerce/ep-commerce.git
+                            fi
+                            """)
+                    api_platform_version = sh(script: "xmlstarlet sel -t -v /_:project/_:properties/_:api-platform.version /home/ec2-user/jenkins_home/workspace/automation/create-sprint-delivery/ep-commerce/pom.xml")
                     echo api_platform_version
                 }   
             }
