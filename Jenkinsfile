@@ -20,15 +20,15 @@ pipeline{
             steps{
                 script{
                     sh ( script: "git clone https://github.elasticpath.net/commerce/ep-commerce.git")
-                    //api_platform_version = sh(script: "xmlstarlet sel -t -v /_:project/_:properties/_:api-platform.version pom.xml")
-                    //echo api_platform_version
+                    api_platform_version = sh(script: "xmlstarlet sel -t -v /_:project/_:properties/_:api-platform.version pom.xml")
+                    echo api_platform_version
                 }   
             }
         }
         stage('Verify'){//step 2
             steps{
                 script{
-                    sh (script: "wget -m https://nexus-master.elasticpath.net/nexus/content/repositories/ep-releases/com/elasticpath/rest/bill-of-materials/")
+                    sh (script: "wget https://nexus-master.elasticpath.net/nexus/content/repositories/ep-releases/com/elasticpath/rest/bill-of-materials/")
                     count = sh(script: "grep -c ${api_platform_version} nexus-master.elasticpath.net/nexus/content/repositories/ep-releases/com/elasticpath/rest/bill-of-materials/index.html")
                     echo count
                     }
