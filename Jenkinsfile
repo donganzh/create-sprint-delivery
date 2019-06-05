@@ -21,11 +21,15 @@ pipeline{
                 script{
                     
                     sh ( script: """
-                            if [ ! -d "$ep-commerce"]; then
+                            if [ ! -d "/home/ec2-user/jenkins_home/workspace/automation/create-sprint-delivery/ep-commerce" ]; then
                                 git clone https://github.elasticpath.net/commerce/ep-commerce.git
+                             else
+                                echo "Directory already exists."
                             fi
                             """)
-                    api_platform_version = sh(script: "xmlstarlet sel -t -v /_:project/_:properties/_:api-platform.version /home/ec2-user/jenkins_home/workspace/automation/create-sprint-delivery/ep-commerce/pom.xml")
+                    api_platform_version = sh(script: "xmlstarlet sel -t -v /_:project/_:properties/_:api-platform.version /home/ec2-user/jenkins_home/workspace/automation/create-sprint-delivery/ep-commerce/pom.xml",
+                                            returnStdout: true
+                    ).trim()
                     echo api_platform_version
                 }   
             }
@@ -33,8 +37,16 @@ pipeline{
         stage('Verify'){//step 2
             steps{
                 script{
-                    sh (script: "wget https://nexus-master.elasticpath.net/nexus/content/repositories/ep-releases/com/elasticpath/rest/bill-of-materials/")
-                    count = sh(script: "grep -c ${api_platform_version} nexus-master.elasticpath.net/nexus/content/repositories/ep-releases/com/elasticpath/rest/bill-of-materials/index.html")
+                    sh (script: """
+                        if [ ! -f /home/ec2-user/jenkins_home/workspace/automation/create-sprint-delivery/index.html ]; then
+                            wget https://nexus-master.elasticpath.net/nexus/content/repositories/ep-releases/com/elasticpath/rest/bill-of-materials/
+                        else
+                            echo "File already exists."
+                        fi
+                        """)
+                    count = sh(script: "grep -c ${api_platform_version} /home/ec2-user/jenkins_home/workspace/automation/create-sprint-delivery/index.html",
+                                returnStdout: true
+                    ).trim()
                     echo count
                     }
                 }
