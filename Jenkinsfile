@@ -1,15 +1,7 @@
 #!/usr/bin/env groovy
 
-def getSCMInfroFromLatestGoodBuild(url, jobName, username='adong', password='Barton@679768'){
-    J = Jenkins(url, username, password)
-    job = J[jobName]
-    lgb = job.get_last_good_build()
-    return lgb.get_revision()
-}
-
 def count；
 def api_platform_version；
-def good_version;
 def pipeline_id;
 pipeline{
     agent{
@@ -56,12 +48,9 @@ pipeline{
             steps{
                 script{ 
                     if(count == 0){
-                        good_version = getSCMInfroFromLatestGoodBuild('http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/')
-                        //sh(script:"""curl -X POST http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/build?token=12345 \
-                        //        --data-urlencode json='{"parameter": [{"RELEASE_LEVEL":"minor"}]}'""")
-                        
+                        sh(script:"""curl -X POST http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/build?token=12345 \
+                                --data-urlencode json='{"parameter": [{"RELEASE_LEVEL":"minor"}]}'""")     
                     }
-                    echo good_version
                 }
             }
         }    
@@ -70,7 +59,14 @@ pipeline{
             steps{
                 script{
                     if(count > 0){
-                        pipeline_id = getSCMInfroFromLatestGoodBuild('http://builds.elasticpath.net/pd/job/master/job/task_release-ep-commerce/')
+                        sh(script:
+                        """
+                            wget http://builds.elasticpath.net/pd/job/master/job/task_release-ep-commerce/lastSuccessfulBuild/api/json -O task_release-ep-commerce_lastSuccessfulBuild.json
+                        """)
+                        pipeline_id = sh(script:"
+                            jq -r '.actions[0].parameters[] | select (.name=="PIPELINE_BUILD_ID") | .value' task_release-ep-commerce_lastSuccessfulBuild.json",
+                            returnStdout: true
+                        ).trim()
                         echo pipeline_id
                     }
                 }
