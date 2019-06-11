@@ -86,7 +86,7 @@ pipeline{
         stage('Build gitlab staging epc branch'){
             steps{
                 script{
-                    sh(script:"""curl -X POST http://10.11.12.13/pd/view/Support/job/epc-patch/job/build-gitlab-staging-epc-branch/buildWithParameters \
+                    sh(script:"""curl -X POST http://10.11.12.13/pd/view/Support/job/epc-patch/job/build-gitlab-staging-epc-branch/buildWithParameters
                                     --data-urlencode json='{"parameter": [{"VERSION":"next"}]}'""")
                 }
             }
