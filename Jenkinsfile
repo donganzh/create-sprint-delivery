@@ -63,7 +63,7 @@ pipeline{
                         """
                             wget http://builds.elasticpath.net/pd/job/master/job/task_release-ep-commerce/lastSuccessfulBuild/api/json -O task_release-ep-commerce_lastSuccessfulBuild.json
                         """)
-                        pipeline_id = sh(script: "jq -r '.actions[0].parameters[] | select (.name=="PIPELINE_BUILD_ID") | .value' task_release-ep-commerce_lastSuccessfulBuild.json",
+                        pipeline_id = sh(script: "jq -r '.actions[0].parameters[5].value' task_release-ep-commerce_lastSuccessfulBuild.json",
                             returnStdout: true
                         ).trim()
                         echo pipeline_id
