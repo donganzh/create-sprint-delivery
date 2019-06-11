@@ -57,10 +57,11 @@ pipeline{
                 script{ 
                     if(count == 0){
                         good_version = getSCMInfroFromLatestGoodBuild('http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/')
-                        sh(script:"""curl -X POST http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/build?token=12345 \
-                                --data-urlencode json='{"parameter": [{"RELEASE_LEVEL":"minor"}]}'""")
+                        //sh(script:"""curl -X POST http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/build?token=12345 \
+                        //        --data-urlencode json='{"parameter": [{"RELEASE_LEVEL":"minor"}]}'""")
                         
                     }
+                    echo good_version
                 }
             }
         }    
