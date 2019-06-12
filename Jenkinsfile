@@ -14,14 +14,6 @@ pipeline{
         stage('Clone sources'){//step 1
             steps{
                 script{
-                    
-                    // sh ( script: """
-                    //         if [ ! -d "/home/ec2-user/jenkins_home/workspace/automation/create-sprint-delivery/ep-commerce" ]; then
-                    //             git clone https://github.elasticpath.net/commerce/ep-commerce.git
-                    //          else
-                    //             echo "Directory already exists."
-                    //         fi
-                    //         """)
                     deleteDir()
                     dir('ep-commerce') {
                             git 'https://github.elasticpath.net/commerce/ep-commerce.git'
@@ -93,14 +85,11 @@ pipeline{
                         -u '${BUILDADMIN_CREDENTIAL}' \
                         'http://builds.elasticpath.net/pd/job/master/job/release_stage-git-branch-to-git-repository/buildWithParameters?PIPELINE_BUILD_ID=${pipeline_id}&SOURCE_GIT_URL=git@github.elasticpath.net:ep-source-deploy/ep-commerce.git&SOURCE_GIT_BRANCH=${pipeline_id}&STAGING_GIT_URL=git@code.elasticpath.com:ep-commerce-STAGING/ep-commerce.git&STAGING_GIT_BRANCH=release/next&FORCE_PUSH=true'
                     """)
-                    // sh(script:"""curl -X POST http://builds.elasticpath.net/pd/job/master/job/release_stage-git-branch-to-git-repository/buildWithParameters --data-urlencode json='{"parameter": 
-                    //[{"SOURCE_GIT_URL":"git@github.elasticpath.net:ep-source-deploy/ep-commerce.git","SOURCE_GIT_BRANCH":"${pipeline_id}", "STAGING_GIT_URL":"git@code.elasticpath.com:ep-commerce-STAGING/ep-commerce.git","STAGING_GIT_BRANCH":"release/next","FORCE_PUSH":"true", "PIPELINE_BUILD_ID":"${pipeline_id}"]}' """
-                    //     )
                     }
                 }
             }
         }
-        stage('Build gitlab staging epc branch'){
+        stage('Build gitlab staging epc branch'){//step 6
             steps{
                 script{
                     lastsuccessfulbuild = sh(script:'wget -qO- http://builds.elasticpath.net/pd/job/master/job/release_stage-git-branch-to-git-repository/lastSuccessfulBuild/buildNumber',
@@ -121,8 +110,6 @@ pipeline{
                             http://builds.elasticpath.net/pd/view/Support/job/epc-patch/job/build-gitlab-staging-epc-branch/buildWithParameters?VERSION=next
                         """)
                         }
-                    
-                    // sh(script:"""curl -X POST http://10.11.12.13/pd/view/Support/job/epc-patch/job/build-gitlab-staging-epc-branch/buildWithParameters --data-urlencode json='{"parameter": [{"VERSION":"next"}]}'""")
                 }
             }
         }        
