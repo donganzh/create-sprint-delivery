@@ -3,6 +3,9 @@
 def count；
 def api_platform_version；
 def pipeline_id;
+def lastbuild;
+def lastsuccessfulbuild;
+
 pipeline{
     agent{
         label "node-2xlarge"
@@ -100,12 +103,22 @@ pipeline{
         stage('Build gitlab staging epc branch'){
             steps{
                 script{
-                    withCredentials([usernameColonPassword(credentialsId: 'ep-ad-user-buildadmin', variable: 'BUILDADMIN_CREDENTIAL')]) {
-                    sh("""
-                        curl -X POST \
-                        -u '${BUILDADMIN_CREDENTIAL}' \
-                        http://builds.elasticpath.net/pd/view/Support/job/epc-patch/job/build-gitlab-staging-epc-branch/buildWithParameters?VERSION=next
-                    """)
+                    lastbuild = sh("
+                        wget -qO- http://builds.elasticpath.net/pd/job/master/job/release_stage-git-branch-to-git-repository/lastBuild/buildNumber",
+                        returnStdout: true
+                        ).trim()
+                    lastsuccessfulbuild = sh("
+                        wget -qO- http://builds.elasticpath.net/pd/job/master/job/release_stage-git-branch-to-git-repository/lastSuccessfulBuild/buildNumber",
+                        returnStdout: true
+                        ).trim()
+                    if(lastbuild == lastsuccessfulbuild){
+                        withCredentials([usernameColonPassword(credentialsId: 'ep-ad-user-buildadmin', variable: 'BUILDADMIN_CREDENTIAL')]) {
+                        sh("""
+                            curl -X POST \
+                            -u '${BUILDADMIN_CREDENTIAL}' \
+                            http://builds.elasticpath.net/pd/view/Support/job/epc-patch/job/build-gitlab-staging-epc-branch/buildWithParameters?VERSION=next
+                        """)
+                        }
                     }
                     // sh(script:"""curl -X POST http://10.11.12.13/pd/view/Support/job/epc-patch/job/build-gitlab-staging-epc-branch/buildWithParameters --data-urlencode json='{"parameter": [{"VERSION":"next"}]}'""")
                 }
