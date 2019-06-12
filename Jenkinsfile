@@ -105,12 +105,13 @@ pipeline{
                 script{
                     lastbuild = sh(script:'wget -qO- http://builds.elasticpath.net/pd/job/master/job/release_stage-git-branch-to-git-repository/lastBuild/buildNumber',
                     returnStdout: true).trim()
-                    lastsuccessfulbuild = sh(script:'wget -qO- http://builds.elasticpath.net/pd/job/master/job/release_stage-git-branch-to-git-repository/lastSuccessfulBuild/buildNumber',
-                    returnStdout: true).trim()
-                    echo lastbuild
-                    echo lastsuccessfulbuild
+                    while(lastbuild != lastsuccessfulbuild){
+                        lastsuccessfulbuild = sh(script:'wget -qO- http://builds.elasticpath.net/pd/job/master/job/release_stage-git-branch-to-git-repository/lastSuccessfulBuild/buildNumber',
+                        returnStdout: true).trim()
+                        echo lastbuild
+                        echo lastsuccessfulbuild
+                    }
 
-                    if(lastbuild == lastsuccessfulbuild){
                         withCredentials([usernameColonPassword(credentialsId: 'ep-ad-user-buildadmin', variable: 'BUILDADMIN_CREDENTIAL')]) {
                         sh("""
                             curl -X POST \
