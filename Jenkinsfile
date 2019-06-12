@@ -103,11 +103,13 @@ pipeline{
         stage('Build gitlab staging epc branch'){
             steps{
                 script{
-                    lastbuild = 'wget -qO- http://builds.elasticpath.net/pd/job/master/job/release_stage-git-branch-to-git-repository/lastBuild/buildNumber'
-                    lastsuccessfulbuild = 'wget -qO- http://builds.elasticpath.net/pd/job/master/job/release_stage-git-branch-to-git-repository/lastSuccessfulBuild/buildNumber'
+                    lastbuild = sh(script:'wget -qO- http://builds.elasticpath.net/pd/job/master/job/release_stage-git-branch-to-git-repository/lastBuild/buildNumber',
+                    returnStdout: true).trim()
+                    lastsuccessfulbuild = sh(script:'wget -qO- http://builds.elasticpath.net/pd/job/master/job/release_stage-git-branch-to-git-repository/lastSuccessfulBuild/buildNumber',
+                    returnStdout: true).trim()
                     echo lastbuild
                     echo lastsuccessfulbuild
-                    
+
                     if(lastbuild == lastsuccessfulbuild){
                         withCredentials([usernameColonPassword(credentialsId: 'ep-ad-user-buildadmin', variable: 'BUILDADMIN_CREDENTIAL')]) {
                         sh("""
