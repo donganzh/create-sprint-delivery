@@ -119,7 +119,7 @@ pipeline{
                             http://builds.elasticpath.net/pd/view/Support/job/epc-patch/job/build-gitlab-staging-epc-branch/buildWithParameters?VERSION=next
                         """)
                         }
-                    }
+                    
                     // sh(script:"""curl -X POST http://10.11.12.13/pd/view/Support/job/epc-patch/job/build-gitlab-staging-epc-branch/buildWithParameters --data-urlencode json='{"parameter": [{"VERSION":"next"}]}'""")
                 }
             }
