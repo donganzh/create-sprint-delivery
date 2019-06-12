@@ -12,13 +12,17 @@ pipeline{
             steps{
                 script{
                     
-                    sh ( script: """
-                            if [ ! -d "/home/ec2-user/jenkins_home/workspace/automation/create-sprint-delivery/ep-commerce" ]; then
-                                git clone https://github.elasticpath.net/commerce/ep-commerce.git
-                             else
-                                echo "Directory already exists."
-                            fi
-                            """)
+                    // sh ( script: """
+                    //         if [ ! -d "/home/ec2-user/jenkins_home/workspace/automation/create-sprint-delivery/ep-commerce" ]; then
+                    //             git clone https://github.elasticpath.net/commerce/ep-commerce.git
+                    //          else
+                    //             echo "Directory already exists."
+                    //         fi
+                    //         """)
+                    deleteDir()
+                    dir('ep-commerce') {
+                            git 'https://github.elasticpath.net/commerce/ep-commerce.git'
+                    }
                     api_platform_version = sh(script: "xmlstarlet sel -t -v /_:project/_:properties/_:api-platform.version /home/ec2-user/jenkins_home/workspace/automation/create-sprint-delivery/ep-commerce/pom.xml",
                                             returnStdout: true
                     ).trim()
@@ -48,8 +52,12 @@ pipeline{
             steps{
                 script{ 
                     if(count == 0){
-                        sh(script:"""curl -X POST http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/build?token=12345 \
-                                --data-urlencode json='{"parameter": [{"RELEASE_LEVEL":"minor"}]}'""")     
+                        withCredentials([usernameColonPassword(credentialsId: 'ep-ad-user-buildadmin', variable: 'BUILDADMIN_CREDENTIAL')]) {
+                        sh("""
+                            curl -X POST \
+                            -u '${BUILDADMIN_CREDENTIAL}' \
+                            http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/buildWithParameters?RELEASE_LEVEL=minor
+                        """)
                     }
                 }
             }
@@ -75,15 +83,29 @@ pipeline{
         stage('Release stage git branch to git repo'){//step 5
             steps{
                 script{
-                    sh(script:"""curl -X POST http://builds.elasticpath.net/pd/job/master/job/release_stage-git-branch-to-git-repository/buildWithParameters --data-urlencode json='{"parameter": [{"SOURCE_GIT_URL":"git@github.elasticpath.net:ep-source-deploy/ep-commerce.git","SOURCE_GIT_BRANCH":"${pipeline_id}", "STAGING_GIT_URL":"git@code.elasticpath.com:ep-commerce-STAGING/ep-commerce.git","STAGING_GIT_BRANCH":"release/next","FORCE_PUSH":"true", "PIPELINE_BUILD_ID":"${pipeline_id}"]}' """
-                        )
+                    withCredentials([usernameColonPassword(credentialsId: 'ep-ad-user-buildadmin', variable: 'BUILDADMIN_CREDENTIAL')]) {
+                    sh("""
+                        curl -X POST \
+                        -u '${BUILDADMIN_CREDENTIAL}' \
+                        http://builds.elasticpath.net/pd/job/master/job/release_stage-git-branch-to-git-repository/buildWithParameters?SOURCE_GIT_URL=git@github.elasticpath.net:ep-source-deploy/ep-commerce.git&SOURCE_GIT_BRANCH=${pipeline_id}&STAGING_GIT_URL=git@code.elasticpath.com:ep-commerce-STAGING/ep-commerce.git&STAGING_GIT_BRANCH=release/next&FORCE_PUSH=true&PIPELINE_BUILD_ID=${pipeline_id}
+                    """)
+                    // sh(script:"""curl -X POST http://builds.elasticpath.net/pd/job/master/job/release_stage-git-branch-to-git-repository/buildWithParameters --data-urlencode json='{"parameter": 
+                    //[{"SOURCE_GIT_URL":"git@github.elasticpath.net:ep-source-deploy/ep-commerce.git","SOURCE_GIT_BRANCH":"${pipeline_id}", "STAGING_GIT_URL":"git@code.elasticpath.com:ep-commerce-STAGING/ep-commerce.git","STAGING_GIT_BRANCH":"release/next","FORCE_PUSH":"true", "PIPELINE_BUILD_ID":"${pipeline_id}"]}' """
+                    //     )
                 }
             }
         }
         stage('Build gitlab staging epc branch'){
             steps{
                 script{
-                    sh(script:"""curl -X POST http://10.11.12.13/pd/view/Support/job/epc-patch/job/build-gitlab-staging-epc-branch/buildWithParameters --data-urlencode json='{"parameter": [{"VERSION":"next"}]}'""")
+                    withCredentials([usernameColonPassword(credentialsId: 'ep-ad-user-buildadmin', variable: 'BUILDADMIN_CREDENTIAL')]) {
+                    sh("""
+                        curl -X POST \
+                        -u '${BUILDADMIN_CREDENTIAL}' \
+                        http://builds.elasticpath.net/pd/view/Support/job/epc-patch/job/build-gitlab-staging-epc-branch/buildWithParameters?VERSION=next
+                    """)
+                }
+                    // sh(script:"""curl -X POST http://10.11.12.13/pd/view/Support/job/epc-patch/job/build-gitlab-staging-epc-branch/buildWithParameters --data-urlencode json='{"parameter": [{"VERSION":"next"}]}'""")
                 }
             }
         }
