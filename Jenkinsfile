@@ -3,8 +3,8 @@
 def count；
 def api_platform_version；
 def pipeline_id;
-def lastbuild;
-def lastsuccessfulbuild;
+def lastbuild = 0;
+def lastsuccessfulbuild = 1;
 
 pipeline{
     agent{
@@ -103,10 +103,10 @@ pipeline{
         stage('Build gitlab staging epc branch'){
             steps{
                 script{
-                    lastbuild = sh(script:'wget -qO- http://builds.elasticpath.net/pd/job/master/job/release_stage-git-branch-to-git-repository/lastBuild/buildNumber',
-                    returnStdout: true).trim()
                     while(lastbuild != lastsuccessfulbuild){
                         lastsuccessfulbuild = sh(script:'wget -qO- http://builds.elasticpath.net/pd/job/master/job/release_stage-git-branch-to-git-repository/lastSuccessfulBuild/buildNumber',
+                        returnStdout: true).trim()
+                        lastbuild = sh(script:'wget -qO- http://builds.elasticpath.net/pd/job/master/job/release_stage-git-branch-to-git-repository/lastBuild/buildNumber',
                         returnStdout: true).trim()
                         echo lastbuild
                         echo lastsuccessfulbuild
