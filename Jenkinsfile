@@ -3,7 +3,7 @@
 def count；
 def api_platform_version；
 def pipeline_id;
-def lastbuild;
+def newsuccessfulbuild;
 def lastsuccessfulbuild;
 
 pipeline{
@@ -105,7 +105,7 @@ pipeline{
                 script{
                     lastsuccessfulbuild = sh(script:'wget -qO- http://builds.elasticpath.net/pd/job/master/job/release_stage-git-branch-to-git-repository/lastSuccessfulBuild/buildNumber',
                                 returnStdout: true).trim()
-                    while(lastbuild == lastsuccessfulbuild){
+                    while(lastsuccessfulbuild == newsuccessfulbuild){
                         newsuccessfulbuild = sh(script:'wget -qO- http://builds.elasticpath.net/pd/job/master/job/release_stage-git-branch-to-git-repository/lastSuccessfulBuild/buildNumber',
                                                 returnStdout: true).trim()
                         echo lastsuccessfulbuild
