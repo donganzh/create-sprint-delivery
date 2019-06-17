@@ -52,10 +52,11 @@ pipeline{
             }
             steps{
                 script{ 
-                    numBuild = sh(script:'wget -qO- http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/lastBuild/buildNumber',
+                    numBuild = sh(script:"wget -qO- http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/lastBuild/buildNumber",
                                             returnStdout: true).trim()
                     echo numBuild
-                    while(totalBuild > 0){
+                    
+                    while(numBuild > 0){
                         sh(script:
                             """
                                 wget http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/${numBuild}/api/json -O task_api_platform.json
