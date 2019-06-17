@@ -45,7 +45,7 @@ pipeline{
        
         stage('Release api-platform'){//step 3
             when{
-                count == 0
+                equals expected: 0, actual: count 
             }
             steps{
                 script{ 
