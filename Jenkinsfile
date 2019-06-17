@@ -7,6 +7,7 @@ def newsuccessfulbuild;
 def lastsuccessfulbuild;
 def numBuild;
 def numRelease;
+def platform_version;
 
 pipeline{
     agent{
