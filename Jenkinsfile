@@ -40,7 +40,6 @@ pipeline{
                     ).trim()
                     echo count
                     release_api_plaform = (count == 0) ? true : false
-                    echo release_api_plaform
                     }
                 }
             }
