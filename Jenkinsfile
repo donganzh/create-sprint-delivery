@@ -40,13 +40,16 @@ pipeline{
                     ).trim()
                     echo count
                     release_api_plaform = (count == 0) ? true : false
+                    echo release_api_plaform
                     }
                 }
             }
        
         stage('Release api-platform'){//step 3
             when {
+                not{
                 expression{release_api_plaform}
+                }
             }
             steps{
                 script{ 
