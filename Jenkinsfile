@@ -8,7 +8,7 @@ def lastsuccessfulbuild;
 def numBuild;
 def numRelease;
 def platform_version;
-//def pipe_id = "PIPELINE_BUILD_ID";
+def release_api_plaform;
 
 pipeline{
     agent{ 
@@ -39,13 +39,14 @@ pipeline{
                                 returnStdout: true
                     ).trim()
                     echo count
+                    release_api_plaform = (count == 0) ? true : false
                     }
                 }
             }
        
         stage('Release api-platform'){//step 3
             when {
-                environment name: 'count', value: '0'
+                expression{release_api_plaform}
             }
             steps{
                 script{ 
