@@ -19,8 +19,8 @@ pipeline{
             steps{
                 script{
                     deleteDir()
-                    String filename = "index.html"
-                    boolean file_del = new File(filename).delete()
+                    def filename = "index.html"
+                    def file_del = File(filename).delete()
                     dir('ep-commerce') {
                             git 'https://github.elasticpath.net/commerce/ep-commerce.git'
                     }
