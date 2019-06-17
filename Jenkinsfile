@@ -45,7 +45,7 @@ pipeline{
        
         stage('Release api-platform'){//step 3
             when {
-                equals expected: 0, actual: count//environment name: 'count', value: '0'
+                environment name: 'count', value: '0'
             }
             steps{
                 script{ 
@@ -88,7 +88,7 @@ pipeline{
                         """
                             wget http://builds.elasticpath.net/pd/job/master/job/task_release-ep-commerce/lastSuccessfulBuild/api/json -O task_release-ep-commerce_lastSuccessfulBuild.json
                         """)
-                        pipeline_id = sh(script: "jq -r '.actions[0].parameters[] | select (.name == ${pipe_id} ) | .value' task_release-ep-commerce_lastSuccessfulBuild.json",
+                        pipeline_id = sh(script: "jq -r '.actions[0].parameters[] | select (.name == "${pipe_id}" ) | .value' task_release-ep-commerce_lastSuccessfulBuild.json",
                                         returnStdout: true
                                         ).trim()
                         echo pipeline_id
