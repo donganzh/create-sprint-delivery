@@ -55,7 +55,7 @@ pipeline{
                     numBuild = sh(script:"wget -qO- http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/lastSuccessfulBuild/buildNumber",
                                             returnStdout: true).trim()
                     echo numBuild
-                    numBuild = 28
+
                     while(numBuild > 0){
                         withCredentials([usernameColonPassword(credentialsId: 'ep-ad-user-buildadmin', variable: 'BUILDADMIN_CREDENTIAL')]) {
                         sh(script:
