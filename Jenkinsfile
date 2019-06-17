@@ -51,6 +51,7 @@ pipeline{
                 script{ 
                     numBuild = sh(script:'wget -qO- http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/lastBuild/buildNumber',
                                             returnStdout: true).trim()
+                    echo numBuild
                     while(totalBuild > 0){
                         sh(script:
                             """
