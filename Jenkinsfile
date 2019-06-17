@@ -19,8 +19,6 @@ pipeline{
             steps{
                 script{
                     deleteDir()
-                    def filename = "index.html"
-                    def file_del = File(filename).delete()
                     dir('ep-commerce') {
                             git 'https://github.elasticpath.net/commerce/ep-commerce.git'
                     }
@@ -35,7 +33,11 @@ pipeline{
             steps{
                 script{
                     sh (script: """
+                        if [ ! -f ${WORKSPACE}/index.html ]; then
                             wget https://nexus-master.elasticpath.net/nexus/content/repositories/ep-releases/com/elasticpath/rest/bill-of-materials/
+                        else
+                            echo "File already exists."
+                        fi
                         """)
                     count = sh(script: "grep -c ${api_platform_version} ${WORKSPACE}/index.html",
                                 returnStdout: true
