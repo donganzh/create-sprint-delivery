@@ -35,7 +35,9 @@ pipeline{
                     sh (script: """
                             wget https://nexus-master.elasticpath.net/nexus/content/repositories/ep-releases/com/elasticpath/rest/bill-of-materials/
                         """)
-                    count = sh(script: "grep -c ${api_platform_version} ${WORKSPACE}/index.html", returnStdout: true).trim()
+                    count = sh(script: "grep -c ${api_platform_version} /home/ec2-user/jenkins_home/workspace/automation/create-sprint-delivery/index.html",
+                                returnStdout: true
+                    ).trim()
                     echo count
                     }
                 }
@@ -43,7 +45,7 @@ pipeline{
        
         stage('Release api-platform'){//step 3
             when{
-                expression{count == 0}
+                count == 0
             }
             steps{
                 script{ 
