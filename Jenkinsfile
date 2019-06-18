@@ -52,15 +52,15 @@ pipeline{
             }
             steps{
                 script{ 
-                    numBuild = sh(script:"wget -qO- http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/lastSuccessfulBuild/buildNumber",
-                                            returnStdout: true).trim()
-                    echo numBuild
-
+                    // numBuild = sh(script:"wget -qO- http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/lastSuccessfulBuild/buildNumber",
+                    //                         returnStdout: true).trim()
+                    // echo numBuild
+                    numBuild = 28
                     while(numBuild > 0){
                         withCredentials([usernameColonPassword(credentialsId: 'ep-ad-user-buildadmin', variable: 'BUILDADMIN_CREDENTIAL')]) {
                         sh(script:
                             """
-                                wget -U '${BUILDADMIN_CREDENTIAL}' http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/${numBuild}/api/json -O task_api_platform.json
+                                curl -X GET -u '${BUILDADMIN_CREDENTIAL}' -o task_api_platform.json http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/${numBuild}/api/json
                             """)
                         }
                         platform_version = sh (script:"jq -r '.description' task_api_platform.json",
