@@ -5,8 +5,8 @@ def api_platform_version；
 def pipeline_id;
 def newsuccessfulbuild;
 def lastsuccessfulbuild;
-def numBuild;
-def numRelease;
+def numBuild = 0;
+def numRelease = 0;
 def platform_version;
 def release_api_plaform;
 
@@ -66,12 +66,13 @@ pipeline{
                         platform_version = sh (script:"jq -r '.description' task_api_platform.json",
                                             returnStdout: true).trim()
                         echo platform_version
-                        if(platform_version == api_platform_version){
+                        if(platform_version.contains(api_platform_version)){
                             numRelease = numBuild
                             break
+                        }else{
+                            numBuild--
+                            echo numBuild
                         }
-                        numBuild--
-                        echo numBuild
                         
                     }
 
