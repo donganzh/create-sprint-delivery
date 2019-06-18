@@ -52,10 +52,11 @@ pipeline{
             }
             steps{
                 script{ 
-                    // numBuild = sh(script:"wget -qO- http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/lastSuccessfulBuild/buildNumber",
-                    //                         returnStdout: true).trim()
-                    // echo numBuild
-                    numBuild = 28
+                    withCredentials([usernameColonPassword(credentialsId: 'ep-ad-user-buildadmin', variable: 'BUILDADMIN_CREDENTIAL')]) {
+                    numBuild = sh(script:" curl -X GET -u '${BUILDADMIN_CREDENTIAL}' http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/lastSuccessfulBuild/buildNumber",
+                                            returnStdout: true).trim()
+                    }
+                    echo numBuild
                     while(numBuild > 0){
                         withCredentials([usernameColonPassword(credentialsId: 'ep-ad-user-buildadmin', variable: 'BUILDADMIN_CREDENTIAL')]) {
                         sh(script:
@@ -70,7 +71,7 @@ pipeline{
                             numRelease = numBuild
                             break
                         }else{
-                            numBuild--
+                            numBuild = numBuild - 1
                             echo numBuild
                         }
                         
