@@ -5,7 +5,8 @@ def api_platform_version；
 def pipeline_id;
 def newsuccessfulbuild;
 def lastsuccessfulbuild;
-def numBuild = 0;
+def numBuild;
+def num_Build = 0;
 def numRelease = 0;
 def platform_version;
 def release_api_plaform;
@@ -56,8 +57,9 @@ pipeline{
                     numBuild = sh(script:" curl -X GET -u '${BUILDADMIN_CREDENTIAL}' http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/lastSuccessfulBuild/buildNumber",
                                             returnStdout: true).trim()
                     }
+                    num_Build = numBuild.toInteger()
                     echo numBuild
-                    while(numBuild > 0){
+                    while(num_Build > 0){
                         withCredentials([usernameColonPassword(credentialsId: 'ep-ad-user-buildadmin', variable: 'BUILDADMIN_CREDENTIAL')]) {
                         sh(script:
                             """
