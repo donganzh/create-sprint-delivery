@@ -1,13 +1,14 @@
 #!/usr/bin/env groovy
 
 def count；
+def num_count;
 def api_platform_version；
 def pipeline_id;
 def newsuccessfulbuild;
 def lastsuccessfulbuild;
-def numBuild;
+def stringBuild;
 def num_Build = 0;
-def numRelease = 0;
+def num_Release = 0;
 def platform_version;
 def release_api_plaform;
 
@@ -39,52 +40,47 @@ pipeline{
                     count = sh(script: "grep -c ${api_platform_version} ${WORKSPACE}/index.html || :",
                                 returnStdout: true
                     ).trim()
+                    num_count = count.toInteger()
                     echo count
-                    release_api_plaform = (count == 0) ? true : false
+                    release_api_plaform = (num_count == 0) ? true : false
                     }
                 }
             }
        
         stage('Release api-platform'){//step 3
             when {
-                not{
                 expression{release_api_plaform}
-                }
             }
             steps{
                 script{ 
                     withCredentials([usernameColonPassword(credentialsId: 'ep-ad-user-buildadmin', variable: 'BUILDADMIN_CREDENTIAL')]) {
-                    numBuild = sh(script:" curl -X GET -u '${BUILDADMIN_CREDENTIAL}' http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/lastSuccessfulBuild/buildNumber",
+                    stringBuild = sh(script:" curl -X GET -u '${BUILDADMIN_CREDENTIAL}' http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/lastSuccessfulBuild/buildNumber",
                                             returnStdout: true).trim()
                     }
-                    num_Build = numBuild.toInteger()
-                    echo numBuild
+                    num_Build = stringBuild.toInteger()
                     while(num_Build > 0){
                         withCredentials([usernameColonPassword(credentialsId: 'ep-ad-user-buildadmin', variable: 'BUILDADMIN_CREDENTIAL')]) {
                         sh(script:
                             """
-                                curl -X GET -u '${BUILDADMIN_CREDENTIAL}' -o task_api_platform.json http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/${numBuild}/api/json
+                                curl -X GET -u '${BUILDADMIN_CREDENTIAL}' -o task_api_platform.json http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform/job/master/${num_Build}/api/json
                             """)
                         }
                         platform_version = sh (script:"jq -r '.description' task_api_platform.json",
                                             returnStdout: true).trim()
-                        echo platform_version
                         if(platform_version.contains(api_platform_version)){
-                            numRelease = numBuild
+                            num_Release = num_Build
                             break
-                        }else{
-                            numBuild = numBuild - 1
-                            echo numBuild
                         }
                         
+                        num_Build--
+
                     }
 
-                    echo numRelease
                     withCredentials([usernameColonPassword(credentialsId: 'ep-ad-user-buildadmin', variable: 'BUILDADMIN_CREDENTIAL')]) {
                     sh("""
                         curl -X POST \
                         -u '${BUILDADMIN_CREDENTIAL}' \
-                        http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform_release/buildWithParameters?PROJECT_CI_JOB_BUILD_NUMBER=${numRelease}
+                        http://builds.elasticpath.net/pd2/job/api-platform/job/api-platform_release/buildWithParameters?PROJECT_CI_JOB_BUILD_NUMBER=${num_Release}
                         """)
                     }   
                 }
