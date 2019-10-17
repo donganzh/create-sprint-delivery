@@ -11,6 +11,7 @@ def num_Build = 0;
 def num_Release = 0;
 def platform_version;
 def release_api_platform;
+def release_ = 0;
 
 pipeline{
     agent{ 
