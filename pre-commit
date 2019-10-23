@@ -1,0 +1,58 @@
+#!/bin/bash
+#
+# Copyright thomas dot braun aeht virtuell minus zuhause dot de,  2013
+#
+# A hook script to check that the to-be-commited files are valid
+# filenames on a windows platform.
+# Sources:
+# - http://stackoverflow.com/a/62888
+# - http://msdn.microsoft.com/en-us/library/aa365247.aspx
+#
+# To enable this hook, rename this file to "pre-commit", move it to ".git/hook" and make it executable.
+
+if git rev-parse --verify HEAD >/dev/null 2>&1
+then
+	against=HEAD
+else
+	# Initial commit: diff against an empty tree object
+	against=
+fi
+
+enforcecompatiblefilenames=$(git config hooks.enforcecompatiblefilenames)
+
+# Redirect output to stderr.
+exec 1>&2
+
+if test "$enforcecompatiblefilenames" != "true"
+then
+  exit 0
+fi
+
+git diff --cached --name-only --diff-filter=A -z $against | while IFS= read -r -d '' filename; do
+  # Check complete path length to be smaller than 260 characters
+  # This test can not be really accurate as we don't know if PWD on the windows filesystem itself is not very long 
+  absolutepathtoolong=0
+  if test $(echo "$filename" | wc -c) -ge 240
+  then
+    absolutepathtoolong=1
+  fi
+
+  # debug output
+  if test -n "$GIT_TRACE"
+  then
+    echo "File: ${filename}"
+    echo absolutepathtoolong=$absolutepathtoolong
+  fi
+
+  if test $absolutepathtoolong -ne 0
+  then
+    echo "Error: Attempt to add a file name which is incompatible to windows file systems."
+    echo
+    echo "If you know what you are doing you can disable this"
+    echo "check using:"
+    echo
+    echo "git config hooks.enforcecompatiblefilenames false"
+    echo
+    exit 1
+  fi
+done
