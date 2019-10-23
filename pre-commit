@@ -52,7 +52,6 @@ git diff --cached --name-only --diff-filter=A -z $against | while IFS= read -r -
     echo "check using:"
     echo
     echo "git config hooks.enforcecompatiblefilenames false"
-    echo
     exit 1
   fi
 done
